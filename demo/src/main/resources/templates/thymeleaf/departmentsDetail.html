@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="layout/head::header"></head>
+<script>
+	
+	//체크박스 전체 선택
+	function onclickAllCheckbox(chkAll) {
+		
+		$('input[name="chkRow"]').each((i, e) => {
+			 if(chkAll.checked){
+				 $(e).prop('checked', true); //체크
+				 onchangeRate(); //체크된 행의 인상급여 계산
+			 } else {
+				 $(e).prop('checked', false); //체크해제
+			 }
+		});
+		
+		switchSelectBox(); //선택 박스 설정
+		
+	}
+	
+	//체크박스 개별 선택
+	function onchangeCheckbox(target) {
+		
+	    if (target.checked){ 
+			onchangeRate(); //체크된 행의 인상급여 계산
+		} else { 
+			$(target).closest('tr').find('.empIncreased').val(''); //체크 되지 않은 행의 인상급여 계산 삭제
+		}
+		
+		switchSelectBox(); //선택 박스 설정
+		
+	}
+	
+	//선택 박스 설정
+	function switchSelectBox(){
+		
+		const checked = $('input[name="chkRow"]:checked'); //체크된 체크박스
+		
+		if (checked.length > 0){
+			$('#selectRate').attr("disabled", false); //select box 활성화
+		} else {
+			$('#selectRate').attr("disabled", true);  //select box 비활성화
+			$('#selectRate').val(''); //select box 리셋
+			$('.empIncreased').val('');  //전체 empIncreased 리셋
+		}
+	}
+	
+	//인상 급여 계산
+	function onchangeRate() {
+
+		const rate = $('#selectRate').val(); //인상률 값
+		
+		if (rate !== ''){ //인상률 값이 있을 때
+			$(".emp").each((i, e) => {
+				const rowChk = $(e).find("input.chkRow");
+			    if (rowChk[0].checked) {
+			        const empSalary = parseInt($(e).find(".empSalary").text());
+					const calculate = Math.floor(empSalary*(1+(rate/100)));
+					$(e).find(".empIncreased").val(calculate);
+			    }
+			});
+		} else { //인상률 값이 없을 때
+			$('.empIncreased').val('');  //전체 empIncreased 리셋
+		}
+		
+	}
+	
+	//급여 인상 정보 반영
+	function onclickModify(id){
+		
+		if (confirm("반영하시겠습니까?")){
+			
+			let dataList = [];
+			$('input[name="chkRow"]').each((i, e) => {
+				 if(e.checked){				 
+					const employeeId = $(e).closest('tr').find(".employeeId").text();
+					const salary = $(e).closest('tr').find(".empIncreased").val();
+					let data = {"id" : employeeId, "salary" : salary};
+					dataList.push(data);
+				 }
+			});
+			
+			$.ajax({
+	            type: 'PUT',
+	            contentType: 'application/json',
+	            url: '/departments/'+id,
+	            data: JSON.stringify(dataList),
+	            success: function(data){
+					alert("반영되었습니다.");
+					window.location.href = '/departments/'+ id;
+				},
+	            error: function(){
+					console.log("error");
+				}
+	        });
+		}
+		
+	}
+	
+</script>
+<body>
+	<div th:replace="layout/nav::nav"></div>
+	<div class="container mt-5">
+	    <table class="table table-hover mt-2">
+	        <tbody>
+	            <tr>
+		            <th>부서번호</th><td th:text="${department.departmentId}"></td>
+		        </tr>
+		        <tr>
+					<th>부서명</th><td th:text="${department.departmentName}"></td>
+				</tr>
+				<tr>
+					<th>부서장</th><td th:text="${department.managerName}"></td>
+				</tr>
+				<tr>
+					<th>부서위치</th><td th:text="${department.locations}"></td>
+				</tr>
+	        </tbody>
+	    </table>
+	    <table class="table table-hover text-center align-middle mt-2">
+	        <thead>
+	            <tr>
+	                <th class="col-1">
+						<input class="form-check-input" type="checkbox" th:id="chkAll" onclick="onclickAllCheckbox(this)">
+					</th>
+	                <th class="col-1">사번</th>
+	                <th class="col-auto">사원명</th>
+	                <th class="col-auto">담당업무</th>
+	                <th class="col-2">급여</th>
+	                <th class="col-2">인상급여</th>
+	            </tr>
+	        </thead>
+	        <tbody>
+				<tr th:if="${#lists.isEmpty(employeeList)}">
+				    <td colspan="4">정보가 존재하지 않습니다.</td>
+				</tr>
+				<tr class="emp" th:each="list, row : ${employeeList}">
+					<td>
+						<input type="checkbox" th:id="'chk'+${row.index}" name="chkRow" class="form-check-input chkRow" onchange="onchangeCheckbox(this)">
+					</td>
+	                <td th:text="${list.employeeId}" class="employeeId"></td>
+	                <td th:text="${list.fullName}"></td>
+	                <td th:text="${list.jobTitle}"></td>
+	                <td class="empSalary" th:text="${list.salary}"></td>
+	                <td>
+						<input type="text" class="form-control-plaintext empIncreased" readonly>
+					</td>
+	            </tr>
+			</tbody>
+	    </table>
+		<div class="d-flex justify-content-end gap-2">
+			<div class="col-3">
+				<select class="form-select" id="selectRate" onchange="onchangeRate()" disabled>
+					<option value="">인상률(%)</option>
+					<option value="1">1.00 %</option>
+					<option value="2">2.00 %</option>
+					<option value="3">3.00 %</option>
+					<option value="4">4.00 %</option>
+					<option value="5">5.00 %</option>
+				</select>
+			</div>
+			<div class="col-1">
+				<button type="submit" th:key="${department.departmentId}" th:onclick="onclickModify(this.getAttribute('key'))" class="btn btn-outline-secondary w-100">반영</button>
+			</div>
+		</div>
+    </div>
+</body>
+</html>

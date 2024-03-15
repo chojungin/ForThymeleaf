@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="layout/head::header"></head>
+<script>
+</script>
+<body>
+	<div th:replace="layout/nav::nav"></div>
+	<div class="container mt-5">
+		<form class="mx-auto" th:object="${department}" th:action="@{/department}" method="post">
+			<div class="mb-3 row">
+				<label class="col-2 col-form-label" th:for="departmentId">부서번호</label>
+				<div class="col-10">
+					<input type="text" class="form-control-plaintext" th:field="*{departmentId}" readonly>
+				</div>
+			</div>
+			<div class="mb-3 row">
+				<label class="col-2 col-form-label" th:for="departmentName">부서명</label>
+				<div class="col-10">
+					<input type="text" class="form-control" th:field="*{departmentName}">
+				</div>
+			</div>
+			<div class="mb-3 row">
+				<label class="col-2 col-form-label" th:for="managerName">부서장</label>
+				<div class="col-10">
+					<input type="text" class="form-control" th:field="*{managerName}">
+				</div>
+			</div>
+			<div class="mb-3 row">
+				<label class="col-2 col-form-label" th:for="locations">부서위치</label>
+				<div class="col-10">
+					<input type="text" class="form-control" th:field="*{locations}">
+				</div>
+			</div>
+			<div class="row">
+				<button type="submit" onclick="onclickSave()" class="btn btn-outline-secondary">Save</button>
+			</div>
+		</form>
+	</div>
+</body>

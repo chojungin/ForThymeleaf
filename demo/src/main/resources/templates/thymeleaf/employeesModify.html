@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="layout/head::header"></head>
+<script>
+	$(document).ready(() => {
+		
+	});
+	
+	function onclickSave(){
+		$("form").submit();
+		/*const request = JSON.stringify({
+			employeeId : $("#employeeId").val(),
+			fullName : $("#fullName").val(),
+			email : $("#email").val(),
+			phoneNumber : $("#phoneNumber").val()
+		});
+		
+		$.ajax({
+			type: 'POST',
+            url: '/update',
+            contentType: 'application/json',
+            data: request,
+            success: function(data){
+				alert(data);
+			},
+            error: function(data){
+				alert(data);
+			}
+		});*/
+	}
+	
+</script>
+<body>
+	<div th:replace="layout/nav::nav"></div>
+	<div class="container mt-5">
+		<form class="mx-auto" th:object="${employee}" th:action="@{/employees}" method="post">
+			<div class="mb-3 row">
+				<label class="col-2 col-form-label" th:for="employeeId">사번</label>
+				<div class="col-10">
+					<input type="text" class="form-control-plaintext" th:field="*{employeeId}" readonly>
+				</div>
+			</div>
+			<div class="mb-3 row">
+				<label class="col-2 col-form-label" th:for="fullName">사원명</label>
+				<div class="col-10">
+					<input type="text" class="form-control" th:field="*{fullName}">
+				</div>
+			</div>
+			<div class="mb-3 row">
+				<label class="col-2 col-form-label" th:for="email">이메일</label>
+				<div class="col-10">
+					<input type="text" class="form-control" th:field="*{email}">
+				</div>
+			</div>
+			<div class="mb-3 row">
+				<label class="col-2 col-form-label" th:for="phoneNumber">전화번호</label>
+				<div class="col-10">
+					<input type="text" class="form-control" th:field="*{phoneNumber}">
+				</div>
+			</div>
+			<div class="mb-3 row">
+				<label class="col-2 col-form-label" th:for="jobTitle">담당직무</label>
+				<div class="col-10">
+					<input type="text" class="form-control-plaintext" th:value="${employee.jobTitle}" readonly>
+				</div>
+			</div>
+			<div class="mb-3 row">
+				<label class="col-2 col-form-label" th:for="departmentName">부서명</label>
+				<div class="col-10">
+					<input type="text" class="form-control-plaintext" th:value="${employee.departmentName}" readonly>
+				</div>
+			</div>
+			<div class="mb-3 row">
+				<label class="col-2 col-form-label" th:for="salary">급여</label>
+				<div class="col-10">
+					<input type="text" class="form-control-plaintext" th:value="${employee.salary}" readonly>
+				</div>
+			</div>
+			<div class="row">
+				<button type="submit" onclick="onclickSave()" class="btn btn-outline-secondary">Save</button>
+			</div>
+		</form>
+	</div>
+</body>
+</html>

@@ -1,0 +1,23 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/postgres
+    driver-class-name: org.postgresql.Driver
+    username: postgres
+    password: postgres
+  jpa:
+    database: postgresql
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+  thymeleaf:
+     prefix: classpath:templates/thymeleaf/
+     check-template-location: true
+     suffix: .html
+     mode: HTML
+     cache: false
+logging:
+  level:
+    org:
+      hibernate:
+        SQL: debug #logger로 출력한다.
+        type: trace #parameter 값 출력
